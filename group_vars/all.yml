@@ -1,0 +1,148 @@
+---
+ntp_servers:
+  - 162.159.200.1
+  - 162.159.200.123
+dns_servers:
+  - 192.168.86.35
+  - 192.168.86.1
+sites:
+  - name: "Basingstoke"
+    time_zone: Europe/London
+    status: active
+    description: Home
+    contact_name: David Field
+    contact_email: david@davidfield.co.uk
+racks:
+  - name: "OFFICE_1"
+    site: "Basingstoke"
+manufacturers:
+  - OpnSense
+  - Thinkpad
+  - Dell
+  - Gigabrix
+  - QNAP
+  - RedHat
+  - Ubuntu
+  - Mikrotik
+  - Proxmox
+  - Google
+tenantgroups:
+  - selfhosted_group
+  - publichosted_group
+  - BXRP
+tenants:
+  - { tenant : homelan, tenant_group: selfhosted_group, tags: [ virtual, onsite ]}
+  - { tenant : ionos, tenant_group: publichosted_group, tags: [ virtual, offsite ]}
+  - { tenant : bxrp, tenant_group: BXRP, tags: [ virtual, offsite, bxrp ]}
+  - { tenant : sits, tenant_group: BXRP, tags: [ virtual, offsite, bxrp, sits ]}
+  - { tenant : treos, tenant_group: BXRP, tags: [ virtual, offsite, bxrp, treos ]}
+
+
+device_types:
+  - { model : VM, manufacturer: Proxmox, slug: vm, tags: [ virtual ], full_depth: False}
+  - { model : IBMServer, manufacturer: Thinkpad, slug: ibm, tags: [ proxmoxhost, safewebbox, onsite ], full_depth: False}
+  - { model : DellServer, manufacturer: Dell, slug: dell, tags: [ proxmoxhost, safewebbox, onsite ], full_depth: False}
+  - { model : BrixServer, manufacturer: Gigabrix, slug: brix, tags: [ proxmoxhost, safewebbox, onsite ], full_depth: False}
+  - { model : NAS, manufacturer: QNAP, slug: qnap, tags: [ storage, safewebbox, onsite, hardware ], full_depth: False}
+  - { model : Router, manufacturer: Mikrotik, slug: mtik, tags: [ hardware, safewebbox, onsite, network ], full_depth: False}
+  - { model : Wifi, manufacturer: Google, slug: google, tags: [ hardware, safewebbox, onsite, network ], full_depth: False}
+platforms:
+  - { name: Proxmox, slug: pmox }
+  - { name: Storage, slug: store }
+  - { name: Network, slug: net }
+  - { name: Vmware, slug: vmw }
+device_roles:
+  - { name: VirtualHost, color: FF0000, vmrole: true }
+  - { name: VPN, color: FF0000, vmrole: true }
+  - { name: Server, color: FF0000, vmrole: false }
+  - { name: Dockerhost, color: FF0000, vmrole: true }
+  - { name: Database, color: FF0000, vmrole: true }
+  - { name: CMDB, color: FF0000, vmrole: true }
+  - { name: Router, color: FF0000, vmrole: false }
+  - { name: WiFi, color: FF0000, vmrole: false }
+cluster_types:
+  - { name: proxmox, description: Proxmox Cluster }
+  - { name: vmware, description: Vmware Cluster }
+  - { name: citrix, description: Citrix Cluster }
+  - { name: storage, description: Storage Cluster }
+  - { name: network, description: Network Cluster }
+cluster_groups:
+  - { name: PVE, slug: PVE}
+  - { name: STORAGE, slug: storage}
+  - { name: NETWORK, slug: network}
+  - { name: SITS, slug: sits}
+  - { name: Sensical, slug: sensical}
+  - { name: Corona, slug: corona}
+  - { name: BXRP, slug: bxrp}
+  - { name: Argenta, slug: argenta}
+  - { name: ionos, slug: ionos}  
+clusters:
+  - { name: pve18, cluster_group: PVE, cluster_type: proxmox, tenant: homelan, tags: [ proxmoxhost, safewebbox, onsite, virtual ]}
+  - { name: pve25, cluster_group: PVE, cluster_type: proxmox, tenant: homelan, tags: [ proxmoxhost, safewebbox, onsite, virtual ]}
+  - { name: pve42, cluster_group: PVE, cluster_type: proxmox, tenant: homelan, tags: [ proxmoxhost, safewebbox, onsite, virtual ]}
+  - { name: pve49, cluster_group: PVE, cluster_type: proxmox, tenant: homelan, tags: [ proxmoxhost, safewebbox, onsite, virtual ]}
+  - { name: store1, cluster_group: STORAGE, cluster_type: storage, tenant: homelan, tags: [ storage, safewebbox, onsite, hardware ]}
+  - { name: net1, cluster_group: NETWORK, cluster_type: network, tenant: homelan, tags: [ network, safewebbox, onsite, hardware ]}
+  - { name: cloud, cluster_group: ionos, cluster_type: vmware, tenant: homelan, tags: [ ionos, safewebbox, offsite, virtual ]}
+  - { name: citrix1, cluster_group: SITS, cluster_type: citrix, tenant: sits, tags: [ offsite, virtual, bxrp, sits, citrix ]}
+vlans:
+  - { vid: 100, desc: Primary VLAN, tags: [ safewebbox, onsite, network ] }
+  - { vid: 300, desc: Secondary VLAN, tags: [ safewebbox, onsite, network ]  }
+rirs:
+  - name: RFC1918
+    is_private: True
+aggregates:
+  - { name: "10.0.0.0/8", desc: RFC1918 - 10, rir: RFC1918, tags: network }
+  - { name: "172.16.0.0/12", desc: RFC1918 - 172, rir: RFC1918, tags: network }
+  - { name: "192.168.0.0/16", desc: RFC1918 - 192, rir: RFC1918, tags: network }
+prefixes:
+  - { prefix: 10.10.0.0/24, desc: Microtik Lan, ispool: true, tags: [ hardware, safewebbox, onsite, network ] }
+  - { prefix: 172.16.0.0/24, desc: DOCKER Lan, ispool: false, tags: [ docker, safewebbox, onsite, network ] }
+  - { prefix: 192.168.86.0/24, desc: Home Lan, ispool: true, tags: [ virtual, safewebbox, onsite, network ] }
+circuit_providers:
+  - name: Zen Internet
+    asn: 7843
+    account: in_good_standing
+    portal_url: http://zen.com
+    noc_contact: support@zeninternet.com
+    comments: "Internet Provider"
+circuit_types:
+  - name: FTTP
+circuits:
+  - cid: home_1g_fttp
+    provider: Zen Internet
+    circuit_type: FTTP
+    status: Active
+    install_date: "2018-06-01"
+    commit_rate: 100000000
+    description: Home Internet 1G line
+    comments: "Delivered"
+tags:
+  - { tag: "proxmoxhost", description: "host running proxmox" }
+  - { tag: "proxmoxclient", description: "virtual guest on proxmox" }
+  - { tag: "safewebbox", description: "Test Company" }
+  - { tag: "onsite", description: "hosted on site" }
+  - { tag: "offsite", description: "hosted in the cloud" }
+  - { tag: "linux", description: "running linx os" }
+  - { tag: "windows", description: "running windows os" }
+  - { tag: "osx", description: "running apple os" }
+  - { tag: "bsd", description: "running BSD" }
+  - { tag: "dns", description: "DNS Server" }
+  - { tag: "docker", description: "Docker Server" }
+  - { tag: "firewall", description: "Firewall Server" }
+  - { tag: "dhcp", description: "DHCP Server" }
+  - { tag: "web", description: "Webserver" }
+  - { tag: "mailserver", description: "mailserver" }
+  - { tag: "storage", description: "storge Server" }
+  - { tag: "vmware", description: "vmware Server" }
+  - { tag: "public", description: "public facing Server" }
+  - { tag: "vpn", description: "VPN Server" }
+  - { tag: "application", description: "application Server" }
+  - { tag: "ionos", description: "OffisteServer" }
+  - { tag: "hardware", description: "OffisteServer" }
+  - { tag: "virtual", description: "Virtual MAchine" }
+  - { tag: "network", description: "Networking Device" }
+  - { tag: "bxrp", description: "BXR Advisory Partners" }
+  - { tag: "sits", description: "Secure IT services Ltd" }
+  - { tag: "treos", description: "Treos Bio" }
+  - { tag: "citrix", description: "Citrix" }

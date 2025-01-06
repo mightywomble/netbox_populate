@@ -1,0 +1,295 @@
+---
+- name: "PLAY 1: SETUP DEVICES WITHIN NETBOX"
+  hosts: localhost
+  connection: local
+  vars:
+    install_state: present
+    NETBOX_URL: https://netbox.lan
+    NETBOX_TOKEN: dfe756822ff5055b0e9d8bf26fe0b2d10f5c58a0
+
+  tasks:
+    - name: "TASK 0: ADD TAGS"
+      netbox.netbox.netbox_tag:
+        netbox_url: "{{ NETBOX_URL }}"
+        netbox_token: "{{ NETBOX_TOKEN }}"
+        validate_certs: no
+        data:
+          name: "{{ tag.tag }}"
+          description: "{{ tag.description }}"
+        state: "{{ install_state }}"
+      register: site_setup
+      loop: "{{ tags }}"
+      loop_control:
+        loop_var: tag
+        label: "{{ tag['tag'] }}"
+      tags: [ sites, devices ]
+
+    - name: "TASK 1: SETUP SITES"
+      netbox.netbox.netbox_site:
+        netbox_url: "{{ NETBOX_URL }}"
+        netbox_token: "{{ NETBOX_TOKEN }}"
+        validate_certs: no
+        data: "{{ site }}"
+        state: "{{ install_state }}"
+      register: site_setup
+      loop: "{{ sites }}"
+      loop_control:
+        loop_var: site
+        label: "{{ site['name'] }}"
+      tags: [ sites, devices ]
+
+    - name: "TASK 2: SETUP RACKS"
+      netbox.netbox.netbox_rack:
+        netbox_url: "{{ NETBOX_URL }}"
+        netbox_token: "{{ NETBOX_TOKEN }}"
+        validate_certs: no
+        data: "{{ rack }}"
+        state: "{{ install_state }}"
+      loop: "{{ racks }}"
+      loop_control:
+        loop_var: rack
+        label: "{{ rack['name'] }}"
+      tags: [ sites, devices ]
+
+    - name: "TASK 3: SETUP MANUFACTURERS"
+      netbox.netbox.netbox_manufacturer:
+        netbox_url: "{{ NETBOX_URL }}"
+        netbox_token: "{{ NETBOX_TOKEN }}"
+        validate_certs: no
+        data:
+          name: "{{ manufacturer }}"
+        state: "{{ install_state }}"
+      loop: "{{ manufacturers }}"
+      loop_control:
+        loop_var: manufacturer
+      tags: [ devices ]
+
+    - name: "TASK 4: SETUP DEVICE TYPES"
+      netbox.netbox.netbox_device_type:
+        netbox_url: "{{ NETBOX_URL }}"
+        netbox_token: "{{ NETBOX_TOKEN }}"
+        validate_certs: no
+        data:
+          model: "{{ device_type.model }}"
+          manufacturer: "{{ device_type.manufacturer }}"
+          slug: "{{ device_type.slug }}"
+          tags: "{{ device_type.tags }}"
+        state: "{{ install_state }}"
+      loop: "{{ device_types }}"
+      loop_control:
+        loop_var: device_type
+        label: "{{ device_type['model'] }}"
+      tags: [ devices ]
+
+    - name: "TASK 5: SETUP PLATFORMS"
+      netbox.netbox.netbox_platform:
+        netbox_url: "{{ NETBOX_URL }}"
+        netbox_token: "{{ NETBOX_TOKEN }}"
+        validate_certs: no
+        data:
+          name: "{{ platform.name }}"
+          slug: "{{ platform.slug }}"
+        state: "{{ install_state }}"
+      loop: "{{ platforms }}"
+      loop_control:
+        loop_var: platform
+        label: "{{ platform['name'] }}"
+      tags: [ devices ]
+
+    - name: "TASK 6: SETUP DEVICE ROLES"
+      netbox.netbox.netbox_device_role:
+        netbox_url: "{{ NETBOX_URL }}"
+        netbox_token: "{{ NETBOX_TOKEN }}"
+        validate_certs: no
+        data:
+          name: "{{ device_role.name }}"
+          color: "{{ device_role.color }}"
+          vm_role: "{{ device_role.vmrole }}"
+        state: "{{ install_state }}"
+      loop: "{{ device_roles }}"
+      loop_control:
+        loop_var: device_role
+        label: "{{ device_role['name'] }}"
+      tags: [ devices ]
+
+    - name: "TASK 7: SETUP VLANS"
+      netbox.netbox.netbox_vlan:
+        netbox_url: "{{ NETBOX_URL }}"
+        netbox_token: "{{ NETBOX_TOKEN }}"
+        validate_certs: no
+        data:
+          name: "VLAN{{ vlan.vid }}"
+          vid: "{{ vlan.vid }}"
+          site: "Basingstoke"
+          description: "{{ vlan.desc }}"
+        state: "{{ install_state }}"
+      register: result
+      loop: "{{ vlans }}"
+      loop_control:
+        loop_var: vlan
+        label: "{{ vlan['vid'] }}"
+      tags: [ ipam ]
+
+    - name: "TASK 8: SETUP RFC1918 RIR"
+      netbox.netbox.netbox_rir:
+        netbox_url: "{{ NETBOX_URL }}"
+        netbox_token: "{{ NETBOX_TOKEN }}"
+        validate_certs: no
+        data: "{{ rir }}"
+        state: "{{ install_state }}"
+      loop: "{{ rirs }}"
+      loop_control:
+        loop_var: rir
+        label: "{{ rir['name'] }}"
+      tags: [ ipam ]
+
+    - name: "TASK 8: SETUP AGGREGRATES"
+      netbox.netbox.netbox_aggregate:
+        netbox_url: "{{ NETBOX_URL }}"
+        netbox_token: "{{ NETBOX_TOKEN }}"
+        validate_certs: no
+        data:
+          prefix: "{{ aggregate.name }}"
+          description: "{{ aggregate.desc }}"
+          rir: "{{ aggregate.rir }}"
+        state: "{{ install_state }}"
+      loop: "{{ aggregates }}"
+      loop_control:
+        loop_var: aggregate
+        label: "{{ aggregate['name'] }}"
+      tags: [ ipam ]
+
+    - name: "TASK 9: SETUP PREFIXES"
+      netbox.netbox.netbox_prefix:
+        netbox_url: "{{ NETBOX_URL }}"
+        netbox_token: "{{ NETBOX_TOKEN }}"
+        validate_certs: no
+        data:
+          family: 4
+          prefix: "{{ prefix.prefix }}"
+          site: "{{ prefix.site | default(omit) }}"
+          status: "{{ prefix.status | default('Active') }}"
+          description: "{{ prefix.desc }}"
+          is_pool: "{{ prefix.ispool }}"
+        state: "{{ install_state }}"
+      loop: "{{ prefixes }}"
+      loop_control:
+        loop_var: prefix
+        label: "{{ prefix['prefix'] }}"
+      tags: [ ipam ]
+
+    - name: "TASK 10: SETUP CIRCUIT PROVIDER"
+      netbox.netbox.netbox_provider:
+        netbox_url: "{{ NETBOX_URL }}"
+        netbox_token: "{{ NETBOX_TOKEN }}"
+        validate_certs: no
+        data: "{{ circuit_provider }}"
+        state: "{{ install_state }}"
+      loop: "{{ circuit_providers }}"
+      loop_control:
+        loop_var: circuit_provider
+        label: "{{ circuit_provider['name'] }}"
+      tags: [ circuit ]
+
+    - name: "TASK 11: SETUP CIRCUIT TYPE"
+      netbox.netbox.netbox_circuit_type:
+        netbox_url: "{{ NETBOX_URL }}"
+        netbox_token: "{{ NETBOX_TOKEN }}"
+        validate_certs: no
+        data: "{{ circuit_type }}"
+        state: "{{ install_state }}"
+      loop: "{{ circuit_types }}"
+      loop_control:
+        loop_var: circuit_type
+        label: "{{ circuit_type['name'] }}"
+      tags: [ circuit ]
+
+    - name: "TASK 12: CREATE LOCAL CIRCUIT"
+      netbox.netbox.netbox_circuit:
+        netbox_url: "{{ NETBOX_URL }}"
+        netbox_token: "{{ NETBOX_TOKEN }}"
+        validate_certs: no
+        data: "{{ circuit }}"
+        state: "{{ install_state }}"
+      loop: "{{ circuits }}"
+      loop_control:
+        loop_var: circuit
+        label: "{{ circuit['cid'] }}"
+      tags: [ circuit ]
+
+    - name: "TASK 13: SETUP TENANT GROUPS"
+      netbox.netbox.netbox_tenant_group:
+        netbox_url: "{{ NETBOX_URL }}"
+        netbox_token: "{{ NETBOX_TOKEN }}"
+        validate_certs: no
+        data:
+          name: "{{ tenant_group }}"
+        state: "{{ install_state }}"
+      loop: "{{ tenantgroups }}"
+      loop_control:
+        loop_var: tenant_group
+      tags: [ organization ]
+
+    - name: "TASK 14: SETUP TENANTS"
+      netbox.netbox.netbox_tenant:
+        netbox_url: "{{ NETBOX_URL }}"
+        netbox_token: "{{ NETBOX_TOKEN }}"
+        validate_certs: no
+        data:
+          name: "{{ tenant.tenant }}"
+          tenant_group: "{{ tenant.tenant_group }}"
+          tags: "{{ tenant.tags | default('Active') }}"
+        state: "{{ install_state }}"
+      loop: "{{ tenants }}"
+      loop_control:
+        loop_var: tenant
+        label: "{{ tenant['tenant'] }}"
+      tags: [ organization ]
+
+    - name: "TASK 15: CLUSTER TYPES"
+      netbox.netbox.netbox_cluster_type:
+        netbox_url: "{{ NETBOX_URL }}"
+        netbox_token: "{{ NETBOX_TOKEN }}"
+        validate_certs: no
+        data:
+          name: "{{ clustertype.name }}"
+          description: "{{ clustertype.description }}"
+        state: "{{ install_state }}"
+      loop: "{{ cluster_types }}"
+      loop_control:
+        loop_var: clustertype
+        label: "{{ clustertype['name'] }}"
+      tags: [ virtualization ]
+
+    - name: "TASK 16: CLUSTER GROUPS"
+      netbox.netbox.netbox_cluster_group:
+        netbox_url: "{{ NETBOX_URL }}"
+        netbox_token: "{{ NETBOX_TOKEN }}"
+        validate_certs: no
+        data:
+          name: "{{ clustergroup.name }}"
+          slug: "{{ clustergroup.slug }}"
+        state: "{{ install_state }}"
+      loop: "{{ cluster_groups }}"
+      loop_control:
+        loop_var: clustergroup
+        label: "{{ clustergroup['name'] }}"
+      tags: [ virtualization ]
+
+    - name: "TASK 17: CLUSTERS"
+      netbox.netbox.netbox_cluster:
+        netbox_url: "{{ NETBOX_URL }}"
+        netbox_token: "{{ NETBOX_TOKEN }}"
+        validate_certs: no
+        data:
+          name: "{{ cluster.name }}"
+          cluster_group: "{{ cluster.cluster_group }}"
+          cluster_type: "{{ cluster.cluster_type }}"
+          tenant: "{{ cluster.tenant }}"
+          tags: "{{ cluster.tags }}"
+        state: "{{ install_state }}"
+      loop: "{{ clusters }}"
+      loop_control:
+        loop_var: cluster
+        label: "{{ cluster['name'] }}"
+      tags: [ virtualization ]

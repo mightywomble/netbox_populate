@@ -1,0 +1,13 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  become: false
+  vars:
+    csvfile: "{{ lookup('file', 'importfiles/hosts.csv') }}"
+  tasks:
+    - name: Parse CSV To YAML
+      template:
+        src: "./templates/iterate_hosts.csv.j2"
+        dest: "./netboximport/import_hosts.yml"
+      run_once: true

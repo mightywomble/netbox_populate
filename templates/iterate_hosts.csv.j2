@@ -1,0 +1,8 @@
+---
+devices:
+{% for item in csvfile.split("\n") %}
+{%   if loop.index != 1 %}
+{%     set list = item.split(",") %}
+  - { host: '{{ list[3]|trim() }}', site: '{{ list[1]|trim() }}', location: '{{ list[2]|trim() }}', tenant_group: '{{ list[4]|trim() }}', tenant: '{{ list[5]|trim() }}', manufacturer: '{{ list[6]|trim() }}', device_type: '{{ list[7]|trim() }}', platform: '{{ list[8]|trim() }}', serial: '{{ list[9]|trim() }}', asset: '{{ list[10]|trim() }}', role: '{{ list[11]|trim() }}', vlan: '{{ list[12]|trim() }}', prefix: '{{ list[13]|trim() }}', ip_address: '{{ list[14]|trim() }}', ostype: '{{ list[15]|trim() }}', os: '{{ list[16]|trim() }}', osversion: '{{ list[17]|trim() }}', cpu: '{{ list[18]|trim() }}', ram: '{{ list[19]|trim() }}', disk: '{{ list[20]|trim() }}', backup: '{{ list[21]|trim() }}', backup_group: '{{ list[22]|trim() }}', backup_role: '{{ list[23]|trim() }}', patch: '{{ list[24]|trim() }}', patch_group: '{{ list[25]|trim() }}', monitor: '{{ list[26]|trim() }}', monitor_method: '{{ list[27]|trim() }}', monitor_tags: '{{ list[28]|trim() }}', monitor_label: '{{ list[29]|trim() }}', comments: '{{ list[30]|trim() }}', datacenter: '{{ list[31]|trim() }}', cluster_group: '{{ list[32]|trim() }}', clusters: '{{ list[33]|trim() }}', vm_id: '{{ list[34]|trim() }}', vm_uuid: '{{ list[35]|trim() }}' }
+{%   endif %} 
+{% endfor %}

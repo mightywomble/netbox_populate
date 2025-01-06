@@ -1,0 +1,21 @@
+name,description
+proxmoxhost, host running proxmox
+proxmoxclient, virtual guest on proxmox 
+safewebbox, Test Company
+onsite, hosted on site
+offsite, hosted in the cloud
+linux, running linx os 
+windows, running windows os 
+osx, running apple os 
+bsd, running BSD 
+dns, DNS Server
+docker, Docker Server
+firewall, Firewall Server
+dhcp, DHCP Server
+web, Webserver
+mailserver, mailserver
+storage, storge Server
+vmware, vmware Server
+public, public facing Server
+vpn, VPN Server
+application, application Server

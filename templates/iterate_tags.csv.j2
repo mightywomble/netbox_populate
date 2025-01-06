@@ -1,0 +1,8 @@
+---
+tags:
+{% for item in csvfile.split("\n") %}
+{%   if loop.index != 1 %}
+{%     set list = item.split(",") %}
+  - { tag: "{{ list[0]|trim() }}", description: "{{ list[1]|trim() }}" }
+{%   endif %}
+{% endfor %}

@@ -1,0 +1,23 @@
+- name: "PLAY 1: SETUP DEVICES WITHIN NETBOX"
+  hosts: localhost
+  connection: local
+  vars:
+    install_state: present
+    NETBOX_URL: https://netbox.lan
+    NETBOX_TOKEN: dfe756822ff5055b0e9d8bf26fe0b2d10f5c58a0
+
+  tasks:
+    - name: "TASK 0: ADD Devices"
+      netbox.netbox.netbox_tag:
+        netbox_url: "{{ NETBOX_URL }}"
+        netbox_token: "{{ NETBOX_TOKEN }}"
+        validate_certs: no
+        data:
+          name: "{{ device.host }}"
+          description: "{{ tag.description }}"
+        state: "{{ install_state }}"
+      register: site_setup
+      loop: "{{ devices }}"
+      loop_control:
+        loop_var: device
+        label: "{{ device['host'] }}"

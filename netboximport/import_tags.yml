@@ -1,0 +1,30 @@
+---
+tags:
+  - { tag: "proxmoxhost", description: "host running proxmox" }
+  - { tag: "proxmoxclient", description: "virtual guest on proxmox" }
+  - { tag: "safewebbox", description: "Test Company" }
+  - { tag: "onsite", description: "hosted on site" }
+  - { tag: "offsite", description: "hosted in the cloud" }
+  - { tag: "linux", description: "running linx os" }
+  - { tag: "windows", description: "running windows os" }
+  - { tag: "osx", description: "running apple os" }
+  - { tag: "bsd", description: "running BSD" }
+  - { tag: "dns", description: "DNS Server" }
+  - { tag: "docker", description: "Docker Server" }
+  - { tag: "firewall", description: "Firewall Server" }
+  - { tag: "dhcp", description: "DHCP Server" }
+  - { tag: "web", description: "Webserver" }
+  - { tag: "mailserver", description: "mailserver" }
+  - { tag: "storage", description: "storge Server" }
+  - { tag: "vmware", description: "vmware Server" }
+  - { tag: "public", description: "public facing Server" }
+  - { tag: "vpn", description: "VPN Server" }
+  - { tag: "application", description: "application Server" }
+  - { tag: "ionos", description: "OffisteServer" }
+  - { tag: "hardware", description: "OffisteServer" }
+  - { tag: "virtual", description: "Virtual MAchine" }
+  - { tag: "network", description: "Networking Device" }
+  - { tag: "bxrp", description: "BXR Advisory Partners" }
+  - { tag: "sits", description: "Secure IT services Ltd" }
+  - { tag: "treos", description: "Treos Bio" }
+  - { tag: "citrix", description: "Citrix" }
